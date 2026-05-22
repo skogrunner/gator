@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	config := Read()
-	config.SetUser("gary")
-    fmt.Println(Read())
+	c := config.Read()
+	c.SetUser("gary")
+    fmt.Println(config.Read())
 }

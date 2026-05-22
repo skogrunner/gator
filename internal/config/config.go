@@ -3,7 +3,7 @@ package config
 const configFileName = ".gatorconfig.json"
 
 type Config struct {
-	db_url string,
+	db_url string
 	current_user_name string
 }
 
@@ -11,8 +11,8 @@ func Read() Config {
 	return Config{}
 }
 
-func (c config) SetUser(name string) {
-	pass
+func (c Config) SetUser(name string) {
+	return
 }
 
 func getConfigFilePath() (string,error) {
