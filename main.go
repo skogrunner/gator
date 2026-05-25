@@ -12,15 +12,16 @@ func main() {
 		fmt.Println("Error in Read", err)
 		os.Exit(1)
 	}
-	err = c.SetUser("gary")
-	if err != nil {
-		fmt.Println("Error in SetUser", err)
-		os.Exit(2)
+	st := state{State: &c}
+    cm := commands{CommandMap: make(map[string]func(*state, command) error)}
+    cm.Register("login", HandlerLogin)
+	if len(os.Args) < 2 {
+		fmt.Println("no command specified")
+		os.Exit(0)
 	}
-	c, err = config.Read()
+	err = cm.Run(st, command{Name: os.Args[1], Args: os.Args[2:]})
 	if err != nil {
-		fmt.Println("Error in 2nd Read", err)
-		os.Exit(3)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-    fmt.Println(c)
 }

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"errors"
 	"encoding/json"
 )
 
@@ -10,6 +12,35 @@ const configFileName = ".gatorconfig.json"
 type Config struct {
 	Url string `json:"db_url"`
 	Name string `json:"current_user_name"`
+}
+
+type state struct {
+	State *Config
+}
+
+type command struct {
+	Name string
+	Args []string
+}
+
+type commands struct {
+	CommandMap map[string]func(*state, command) error
+}
+
+func (c *commands) Run(s *state, cmd command) error {
+	val, ok := c.CommandMap[cmd.Name]
+	if !ok {
+		return errors.New("Command does not exist")
+	}
+	err := val(s, cmd)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *commands) Register(name string, f func(*state, command) error) {
+	c.CommandMap[name] = f
 }
 
 func Read() (Config, error) {
@@ -54,3 +85,14 @@ func getConfigFilePath() (string,error) {
 	return hd + "/.gatorconfig.json", nil
 }
 
+func HandlerLogin(s *state, cmd command) error {
+    if len(cmd.Args) != 1 {
+		return errors.New("Invalid arguments. Usage: LOGIN <username>")
+	}
+	err := s.State.SetUser(cmd.Args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Println("User has been set to", cmd.Args[0])
+	return nil
+}
