@@ -14,20 +14,20 @@ type Config struct {
 	Name string `json:"current_user_name"`
 }
 
-type state struct {
+type State struct {
 	State *Config
 }
 
-type command struct {
+type Command struct {
 	Name string
 	Args []string
 }
 
-type commands struct {
-	CommandMap map[string]func(*state, command) error
+type Commands struct {
+	CommandMap map[string]func(*State, Command) error
 }
 
-func (c *commands) Run(s *state, cmd command) error {
+func (c *Commands) Run(s *State, cmd Command) error {
 	val, ok := c.CommandMap[cmd.Name]
 	if !ok {
 		return errors.New("Command does not exist")
@@ -39,7 +39,7 @@ func (c *commands) Run(s *state, cmd command) error {
 	return nil
 }
 
-func (c *commands) Register(name string, f func(*state, command) error) {
+func (c *Commands) Register(name string, f func(*State, Command) error) {
 	c.CommandMap[name] = f
 }
 
@@ -85,7 +85,7 @@ func getConfigFilePath() (string,error) {
 	return hd + "/.gatorconfig.json", nil
 }
 
-func HandlerLogin(s *state, cmd command) error {
+func HandlerLogin(s *State, cmd Command) error {
     if len(cmd.Args) != 1 {
 		return errors.New("Invalid arguments. Usage: LOGIN <username>")
 	}
